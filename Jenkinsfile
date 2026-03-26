@@ -13,9 +13,15 @@ pipeline {
             steps { checkout scm }
         }
 
+        tools {
+        
+             go 'go-1.24.1' 
+
+        }
+
         stage('Setup Dependencies') {
             steps {
-                // Removed container('go') wrapper
+            
                 sh 'go mod tidy'
                 sh 'go mod vendor'
             }
