@@ -8,16 +8,18 @@ pipeline {
     // Changed from 'kubernetes' to 'any' to use the local Jenkins node environment
     agent any 
 
+     tools {
+        
+             go 'go-1.24.1' 
+
+        }
+
     stages {
         stage('Checkout Code') {
             steps { checkout scm }
         }
 
-        tools {
-        
-             go 'go-1.24.1' 
-
-        }
+    
 
         stage('Setup Dependencies') {
             steps {
