@@ -10,7 +10,7 @@ pipeline {
 
      tools {
         
-             go 'go-1.24.1' 
+             go 'go' 
 
         }
 
