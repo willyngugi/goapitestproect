@@ -49,7 +49,7 @@ pipeline {
         stage("Quality Gate Check") {
             steps {
                 script {
-                    sh "sleep 5"
+                    sh "sleep 10"
                 
                     env.SONAR_HOST_URL = "http://sonarqube:9000" 
                 }
