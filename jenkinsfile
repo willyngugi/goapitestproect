@@ -1,7 +1,7 @@
 def NEXUS_DOCKER_CREDENTIALS = 'nexus-creds'
 def NEXUS_DOCKER_REPO = 'registry.touchvas.work'
 def NEXUS_DOCKER_REPO_URL = 'https://registry.touchvas.work'
-def SERVICE_NAME = 'identity-service'
+def SERVICE_NAME = 'rest-api'
 def imageTag = ""
 
 pipeline {
