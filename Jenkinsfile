@@ -35,30 +35,6 @@ pipeline {
             }
         }
 
-        stage('SonarQube Analysis') {
-            steps {
-                script {
-                    def scannerHome = tool 'SonarQubeScanner'
-                    withSonarQubeEnv('SonarQube') {
-                        sh "${scannerHome}/bin/sonar-scanner -Dsonar.projectKey=${SERVICE_NAME}"
-                    }
-                }
-            }
-        }
-
-        stage("Quality Gate Check") {
-            steps {
-                script {
-                    sh "sleep 10"
-                
-                    env.SONAR_HOST_URL = "http://sonarqube:9000" 
-                }
-                timeout(time: 15, unit: 'MINUTES') {
-                    waitForQualityGate abortPipeline: true
-                }
-            }
-        }
-
         stage('Determine Version') {
             steps {
                 
@@ -94,6 +70,31 @@ pipeline {
                 
             }
         }
+
+        stage('SonarQube Analysis') {
+            steps {
+                script {
+                    def scannerHome = tool 'SonarQubeScanner'
+                    withSonarQubeEnv('SonarQube') {
+                        sh "${scannerHome}/bin/sonar-scanner -Dsonar.projectKey=${SERVICE_NAME}"
+                    }
+                }
+            }
+        }
+
+        stage("Quality Gate Check") {
+            steps {
+                script {
+                    sh "sleep 10"
+                
+                    env.SONAR_HOST_URL = "http://sonarqube:9000" 
+                }
+                timeout(time: 15, unit: 'MINUTES') {
+                    waitForQualityGate abortPipeline: true
+                }
+            }
+        }
+
 
 
         stage('Build and Push Docker Image to Nexus') {
