@@ -59,6 +59,43 @@ pipeline {
             }
         }
 
+        stage('Determine Version') {
+            steps {
+                
+                    script {
+                        sh 'git config --global --add safe.directory "$(pwd)"'
+
+                        def branchName = env.BRANCH_NAME
+                        def gitCommit = sh(script: 'git rev-parse --short HEAD', returnStdout: true).trim()
+                        def isExactTag = sh(script: 'git describe --exact-match --tags HEAD 2>/dev/null || true', returnStdout: true).trim()
+
+                        echo "Branch: ${branchName}"
+                        echo "Commit: ${gitCommit}"
+                        echo "Exact tag: ${isExactTag ?: 'none'}"
+
+                        if (isExactTag) {
+                            // Production release build
+                            imageTag = isExactTag
+                        } else {
+                            // Dev / staging / feature builds
+                            def safeBranch = branchName
+                                .replace('/', '-')
+                                .replace('_', '-')
+                                .toLowerCase()
+
+                            imageTag = "${safeBranch}-${gitCommit}"
+                        }
+
+                        echo "Using image tag: ${imageTag}"
+
+                        env.IMAGE_TAG = imageTag
+                        env.GIT_COMMIT = gitCommit
+                    }
+                
+            }
+        }
+
+
         stage('Build and Push Docker Image to Nexus') {
 
             when {
