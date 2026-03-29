@@ -1,6 +1,4 @@
-def NEXUS_DOCKER_CREDENTIALS = 'nexus-creds'
-def NEXUS_DOCKER_REPO = 'registry.touchvas.work'
-def NEXUS_DOCKER_REPO_URL = 'https://registry.touchvas.work'
+
 def SERVICE_NAME = 'rest-api'
 def imageTag = ""
 
@@ -87,7 +85,7 @@ pipeline {
                 script {
                     sh "sleep 10"
                 
-                    env.SONAR_HOST_URL = "http://sonarqube:9000" 
+                    env.SONAR_HOST_URL = "https://code.touchvas.work" 
                 }
                 timeout(time: 15, unit: 'MINUTES') {
                     waitForQualityGate abortPipeline: true
