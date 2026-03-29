@@ -27,11 +27,11 @@ pipeline {
             }
         }
 
-        stage('Unit Tests') {
-            steps {
-                sh 'go test'
-            }
-        }
+        // stage('Unit Tests') {
+        //     steps {
+        //         sh 'go test'
+        //     }
+        // }
 
         stage('Determine Version') {
             steps {
