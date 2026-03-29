@@ -87,7 +87,7 @@ pipeline {
                 
                     env.SONAR_HOST_URL = "https://code.touchvas.work" 
                 }
-                timeout(time: 15, unit: 'MINUTES') {
+                timeout(time: 30, unit: 'MINUTES') {
                     waitForQualityGate abortPipeline: true
                 }
             }
