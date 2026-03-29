@@ -6,11 +6,11 @@ pipeline {
     // Changed from 'kubernetes' to 'any' to use the local Jenkins node environment
     agent any 
 
-    //  tools {
+     tools {
         
-    //          go 'go' 
+             go 'go' 
 
-    //     }
+        }
 
     stages {
         stage('Checkout Code') {
