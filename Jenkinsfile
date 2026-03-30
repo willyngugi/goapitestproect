@@ -74,7 +74,7 @@ pipeline {
                 script {
                     
                     def branchName = env.BRANCH_NAME
-                    
+
                     echo "Branch: ${branchName}"
                     
                     if (branchName == 'main') {
@@ -106,6 +106,8 @@ pipeline {
                         
                         
                         imageTag = "${branchName}-${nextVersion}"
+
+                        echo "Image Tag: ${imageTag}"
                         
                         
                         env.NEXT_VERSION = nextVersion
