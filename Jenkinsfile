@@ -75,6 +75,8 @@ pipeline {
                     
                     def branchName = env.BRANCH_NAME
                     
+                    echo "Branch: ${branchName}"
+                    
                     if (branchName == 'main') {
                     
                         def versionTags = sh(
