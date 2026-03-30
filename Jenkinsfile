@@ -33,39 +33,95 @@ pipeline {
         //     }
         // }
 
-        stage('Determine Version') {
+        // stage('Determine Version') {
+        //     steps {
+                
+        //             script {
+        //                 sh 'git config --global --add safe.directory "$(pwd)"'
+
+        //                 def branchName = env.BRANCH_NAME
+        //                 def gitCommit = sh(script: 'git rev-parse --short HEAD', returnStdout: true).trim()
+        //                 def isExactTag = sh(script: 'git describe --exact-match --tags HEAD 2>/dev/null || true', returnStdout: true).trim()
+
+        //                 echo "Branch: ${branchName}"
+        //                 echo "Commit: ${gitCommit}"
+        //                 echo "Exact tag: ${isExactTag ?: 'none'}"
+
+        //                 if (isExactTag) {
+        //                     // Production release build
+        //                     imageTag = isExactTag
+        //                 } else {
+        //                     // Dev / staging / feature builds
+        //                     def safeBranch = branchName
+        //                         .replace('/', '-')
+        //                         .replace('_', '-')
+        //                         .toLowerCase()
+
+        //                     imageTag = "${safeBranch}-${gitCommit}"
+        //                 }
+
+        //                 echo "Using image tag: ${imageTag}"
+
+        //                 env.IMAGE_TAG = imageTag
+        //                 env.GIT_COMMIT = gitCommit
+        //             }
+                
+        //     }
+        // }
+
+        stage('Auto-Determine Version') {
             steps {
-                
-                    script {
-                        sh 'git config --global --add safe.directory "$(pwd)"'
-
-                        def branchName = env.BRANCH_NAME
-                        def gitCommit = sh(script: 'git rev-parse --short HEAD', returnStdout: true).trim()
-                        def isExactTag = sh(script: 'git describe --exact-match --tags HEAD 2>/dev/null || true', returnStdout: true).trim()
-
-                        echo "Branch: ${branchName}"
-                        echo "Commit: ${gitCommit}"
-                        echo "Exact tag: ${isExactTag ?: 'none'}"
-
-                        if (isExactTag) {
-                            // Production release build
-                            imageTag = isExactTag
+                script {
+                    
+                    def branchName = env.BRANCH_NAME
+                    
+                    if (branchName == 'main') {
+                    
+                        def versionTags = sh(
+                            script: "git tag -l 'v[0-9]*.[0-9]*.[0-9]*' | sort -V | tail -n1",
+                            returnStdout: true
+                        ).trim()
+                    
+                        if (versionTags.isEmpty()) {
+                            major = 1
+                            minor = 0
+                            patch = 0
+                            nextVersion = "1.0.0"
+                            echo "No existing version tags found. Starting with 1.0.0"
                         } else {
-                            // Dev / staging / feature builds
-                            def safeBranch = branchName
-                                .replace('/', '-')
-                                .replace('_', '-')
-                                .toLowerCase()
-
-                            imageTag = "${safeBranch}-${gitCommit}"
+                            def latestTag = versionTags.replace('v', '')
+                            def versionParts = latestTag.split('\\.')
+                            major = versionParts[0] as Integer
+                            minor = versionParts[1] as Integer
+                            patch = versionParts[2] as Integer
+                            
+                            patch = patch + 1
+                            nextVersion = "${major}.${minor}.${patch}"
+                            
+                            echo "Latest version: ${latestTag}"
+                            echo "Next version: ${nextVersion}"
                         }
-
-                        echo "Using image tag: ${imageTag}"
-
+                        
+                        
+                        imageTag = "${branchName}-${nextVersion}"
+                        
+                        
+                        env.NEXT_VERSION = nextVersion
                         env.IMAGE_TAG = imageTag
-                        env.GIT_COMMIT = gitCommit
+                        env.MAJOR = major.toString()
+                        env.MINOR = minor.toString()
+                        env.PATCH = patch.toString()
+                        
+                    } else {
+                        def gitCommit = sh(script: 'git rev-parse --short HEAD', returnStdout: true).trim()
+                        def safeBranch = branchName.replace('/', '-').toLowerCase()
+                        imageTag = "${safeBranch}-${gitCommit}"
+                        env.IMAGE_TAG = imageTag
                     }
-                
+                    
+                   // env.IMAGE_NAME = "${DOCKER_REGISTRY}/${SERVICE_NAME}:${imageTag}"
+                    echo "Building: ${env.IMAGE_NAME}"
+                }
             }
         }
 
